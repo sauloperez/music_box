@@ -1,6 +1,3 @@
-#!/usr/bin/env ruby
-
-require 'byebug'
 require 'open3'
 
 class StreamPlayer
@@ -31,7 +28,3 @@ class StreamPlayer
   end
 end
 
-filename = ARGV[0]
-
-track = File.open(filename)
-Player.new(track).play
