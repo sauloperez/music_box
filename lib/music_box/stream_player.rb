@@ -6,31 +6,25 @@ class StreamPlayer
   end
 
   def play
-    spawn_player do |stdin, stdout, stderr|
-      @stdin = stdin
+    spawn_player
 
-      basename = File.basename(@file.path)
-      puts "Playing #{basename}..."
+    basename = File.basename(@file.path)
+    puts "Playing #{basename}..."
 
-      begin
-        stdin.puts @file.read
-      rescue IOError => e
-        raise e unless e.message == 'closed stream'
-      end
-    end
+    @stdin.puts @file.read
+  rescue Errno::EPIPE
   end
 
   def stop
-    @stdin.close
+    Process.kill('TERM', @pid)
     puts 'Bye'
   end
 
   private
 
   def spawn_player
-    Open3.popen3('mpg123', '-') do |stdin, stdout, stderr|
-      yield stdin, stdout, stderr
-    end
+    @stdin, @stdout, @stderr, @wait_thread = Open3.popen3('mpg123', '-')
+    @pid = @wait_thread[:pid]
   end
 end
 
