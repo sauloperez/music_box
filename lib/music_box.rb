@@ -1,10 +1,8 @@
-require 'music_box/stream_player'
+require 'music_box/runner'
 
 module MusicBox
-  module_function
-
-  def play(filename)
+  def self.play(filename)
     track = File.open(filename)
-    StreamPlayer.new(track).play
+    Runner.run(track)
   end
 end

@@ -7,16 +7,22 @@ class StreamPlayer
 
   def play
     spawn_player do |stdin, stdout, stderr|
+      @stdin = stdin
+
       basename = File.basename(@file.path)
       puts "Playing #{basename}..."
 
-      stdin.puts @file.read
-      stdin.close
-
-      while output = stdout.read do
-        puts output
+      begin
+        stdin.puts @file.read
+      rescue IOError => e
+        raise e unless e.message == 'closed stream'
       end
     end
+  end
+
+  def stop
+    @stdin.close
+    puts 'Bye'
   end
 
   private
