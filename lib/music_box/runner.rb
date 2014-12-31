@@ -1,21 +1,26 @@
-require 'music_box/stream_player'
+module MusicBox
+  class Runner
+    def self.start
+      new
+    end
 
-class Runner
-  def self.run(track)
-    set_traps
+    def initialize
+      set_traps
 
-    @player = StreamPlayer.new(track)
-    @player.play
-  end
+      @player = StreamPlayer.new
+      @player.play
+    end
 
-  private
+    private
 
-  def self.set_traps
-    trap('INT') { shutdown }
-  end
+    def set_traps
+      trap('INT') { shutdown }
+    end
 
-  def self.shutdown
-    puts 'Stoping...'
-    @player.stop
+    def shutdown
+      puts 'Stoping...'
+      @player.stop if @player
+      exit
+    end
   end
 end

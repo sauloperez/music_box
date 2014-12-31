@@ -9,5 +9,4 @@ $:.unshift File.expand_path('../../lib', bin_file)
 
 require 'music_box'
 
-filename = ARGV[0]
-MusicBox.play(filename)
+MusicBox.start

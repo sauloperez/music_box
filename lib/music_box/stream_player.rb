@@ -1,30 +1,43 @@
-require 'open3'
+require 'socket'
 
-class StreamPlayer
-  def initialize(file)
-    @file = file
-  end
+module MusicBox
+  class StreamPlayer
+    PORT = 4481
 
-  def play
-    spawn_player
+    def initialize
+      @player = PlayerProcess.new
+      @server = Socket.new(:INET, :STREAM)
+      @addr = Socket.pack_sockaddr_in(PORT, '0.0.0.0')
 
-    basename = File.basename(@file.path)
-    puts "Playing #{basename}..."
+      server_loop do |connection|
+        play(connection)
+      end
+    end
 
-    @stdin.puts @file.read
-  rescue Errno::EPIPE
-  end
+    def play(file)
+      @player.play file.read
+    rescue Errno::EPIPE
+    end
 
-  def stop
-    Process.kill('TERM', @pid)
-    puts 'Bye'
-  end
+    def stop
+      @player.kill('TERM')
+      puts 'Bye'
+    end
 
-  private
+    private
 
-  def spawn_player
-    @stdin, @stdout, @stderr, @wait_thread = Open3.popen3('mpg123', '-')
-    @pid = @wait_thread[:pid]
+    def server_loop
+      @server.bind(@addr)
+      @server.listen(Socket::SOMAXCONN)
+
+      loop do
+        puts 'Waiting for connection...'
+
+        connection, _ = @server.accept
+        connection.close_write
+        yield connection
+        connection.close
+      end
+    end
   end
 end
-
