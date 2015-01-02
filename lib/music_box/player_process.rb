@@ -8,13 +8,17 @@ module MusicBox
     end
 
     def kill(signal)
-      Process.kill(signal, @pid)
+      Process.kill(signal, pid)
     end
 
     def play(data)
       puts 'Playing...'
-      @stdin.puts data
+      stdin.puts data
       puts 'Done!'
     end
+
+    private
+
+    attr_reader :pid, :stdin
   end
 end

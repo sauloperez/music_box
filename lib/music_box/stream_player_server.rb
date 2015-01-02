@@ -1,14 +1,17 @@
+require 'byebug'
 require 'socket'
 
 module MusicBox
-  class StreamPlayer
+  class StreamPlayerServer
     PORT = 4481
 
     def initialize
       @player = PlayerProcess.new
       @server = Socket.new(:INET, :STREAM)
       @addr = Socket.pack_sockaddr_in(PORT, '0.0.0.0')
+    end
 
+    def start
       server_loop do |connection|
         play(connection)
       end
