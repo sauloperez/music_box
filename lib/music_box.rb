@@ -1,5 +1,6 @@
 require 'music_box/runner'
 require 'music_box/server'
+require 'music_box/request'
 require 'music_box/player_process'
 
 module MusicBox

@@ -17,32 +17,27 @@ module MusicBox
       end
     end
 
-    def handle(connection)
-      # TODO: watch out for buffer's memory alloaction
-      data = connection.read
-      command = data.match(COMMAND)[0]
+    private
 
-      case command.upcase
-      when 'PLAY'
-        play(data)
-      when 'STOP'
-        stop
+    EXIT = 'EXIT'
+    SIZE_OF_INT = [11].pack('i').size
+
+    attr_reader :server
+
+    def handle(connection)
+      loop do
+        msg_length = get_content_length(connection)
+        payload = connection.read(msg_length)
+        request = Request.new(payload)
+        break if request.command.upcase == EXIT
+
+        request.process
       end
     end
 
-    def play(data)
-      @player ||= PlayerProcess.new
-      @player.play(data)
+    def get_content_length(connection)
+      packed_msg_length = connection.read(SIZE_OF_INT)
+      packed_msg_length.unpack('i').first
     end
-
-    def stop
-      @player.kill('TERM')
-    end
-
-    private
-
-    COMMAND = /^\w+/
-
-    attr_reader :server
   end
 end
