@@ -6,13 +6,14 @@ module MusicBox
 
     def initialize
       set_traps
-      @server = StreamPlayerServer.new
+      @server = Server.new
       @server.start
     end
 
     def shutdown
       puts 'Stoping...'
       @server.stop if @server
+      puts 'Bye'
       exit
     end
 

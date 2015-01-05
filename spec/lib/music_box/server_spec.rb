@@ -1,16 +1,17 @@
 require 'spec_helper'
 
-describe MusicBox::StreamPlayerServer do
-  let(:server) { double(Socket, bind: true, listen: true) }
+describe MusicBox::Server do
+  let(:server) { double(Socket) }
   let(:connection) { double(Socket, close_write: true, close: true) }
+
   before {
-    allow(Socket).to receive(:new).with(:INET, :STREAM).and_return(server)
-    allow(server).to receive(:accept).and_return(connection)
-    allow(subject).to receive(:loop).and_yield
+    allow(TCPServer).to receive(:new).with(port).and_return(server)
   }
 
   describe '#start' do
-    before { allow(subject).to receive(:play).with(connection) }
+    before {
+      allow(Socket).to receive(:accept_loop).and_return(false)
+    }
     after { subject.start }
 
     it 'gets the client connection as a block param' do
@@ -30,11 +31,11 @@ describe MusicBox::StreamPlayerServer do
     end
 
     it 'accepts connections' do
-      expect(server).to receive(:accept)
+      expect(Socket).to receive(:accept_loop).with(server)
     end
 
-    it 'disables writing to the client socket' do
-      expect(connection).to receive(:close_write)
+    it 'handles the connection' do
+      expect(subject).to receive(:handle).with(connection)
     end
 
     it 'closes the connection when done' do
