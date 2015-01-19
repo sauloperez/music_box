@@ -4,6 +4,8 @@ module MusicBox
     attr_reader :command, :body
 
     def initialize(payload)
+      raise Error unless payload.size > 0
+
       @command = payload.match(COMMAND)[0]
       @body = payload.slice(@command.length, payload.length - @command.length)
     end

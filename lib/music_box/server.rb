@@ -1,4 +1,3 @@
-require 'byebug'
 require 'socket'
 
 module MusicBox
